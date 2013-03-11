@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:AirAlert.xcodeproj">
+      location = "self:AirDatePicker.xcodeproj">
    </FileRef>
 </Workspace>

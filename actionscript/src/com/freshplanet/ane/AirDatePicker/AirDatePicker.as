@@ -22,6 +22,8 @@ package com.freshplanet.ane.AirDatePicker
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
+
+	import flash.geom.Point;
 	
 	public class AirDatePicker extends EventDispatcher
 	{
@@ -62,13 +64,20 @@ package com.freshplanet.ane.AirDatePicker
 			return _instance ? _instance : new AirDatePicker();
 		}
 		
-		public function displayDatePicker( year : Number, month : Number, day:Number, callback : Function ) : void
+		public function displayDatePicker( date : Date, position : Point, callback : Function ) : void
 		{
 			if (!isSupported) return;
 			
 			_callback = callback;
 			
-			_context.call("AirDatePickerDisplayDatePicker", year, month, day);
+			_context.call("AirDatePickerDisplayDatePicker", date.fullYear, date.month, date.day, position.x, position.y);
+		}
+
+		public function removeDatePicker( ) : void
+		{
+			if (!isSupported) return;
+			
+			_context.call("AirDatePickerRemoveDatePicker");
 		}
 		
 		
@@ -92,8 +101,9 @@ package com.freshplanet.ane.AirDatePicker
 			{
 				if (_callback !== null)
 				{
-					// TODO Daniel: Retrieve the selected data from the Native part
-					_callback();
+					var newDate : String = event.level as String;
+					trace("[AirDatePicker] new date from Native Extension : ",newDate);	
+					_callback(newDate);
 				}
 				else
 				{

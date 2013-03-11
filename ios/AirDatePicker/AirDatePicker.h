@@ -18,19 +18,24 @@
 
 #import "FlashRuntimeExtensions.h"
 
-@interface AirDatePicker : NSObject <UIAlertViewDelegate>
+@interface AirDatePicker : NSObject <UIPopoverControllerDelegate>
 
 @property (nonatomic, retain) UIDatePicker *datePicker;
 
 + (AirDatePicker *)sharedInstance;
-- (void) start:(NSDate*)date;
+- (void) showDatePickerPhone:(NSDate*)date;
+- (void) showDatePickerPad:(NSDate*)date position:(CGSize)pos;
+- (void) removeDatePicker;
+
+// UIPopoverControllerDelegate
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController;
+- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController;
 
 @end
 
-
 // C interface
 DEFINE_ANE_FUNCTION(AirDatePickerDisplayDatePicker);
-
+DEFINE_ANE_FUNCTION(AirDatePickerRemoveDatePicker);
 
 // ANE setup
 void AirDatePickerContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet);

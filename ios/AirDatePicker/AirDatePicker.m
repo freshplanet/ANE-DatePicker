@@ -22,12 +22,15 @@ FREContext AirDatePickerCtx = nil;
 
 @interface AirDatePicker ()
 
+@property (nonatomic,retain) UIPopoverController *popover;
+
 -(void)dateChanged:(id)sender;
 
 @end
 
 @implementation AirDatePicker
 
+@synthesize popover = _popover;
 @synthesize datePicker = _datePicker;
 
 #pragma mark - Singleton
@@ -54,7 +57,8 @@ static AirDatePicker *sharedInstance = nil;
 }
 
 #pragma mark - UIDatePicker
--(void) start:(NSDate *)date
+
+-(void) showDatePickerPhone:(NSDate *)date
 {
     self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 250, 325, 250)];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
@@ -63,18 +67,66 @@ static AirDatePicker *sharedInstance = nil;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
 
     UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
-    [rootView addSubview:self.datePicker];
-    [self.datePicker release];    
+    [rootView addSubview:self.datePicker];   
+}
+
+- (void) showDatePickerPad:(NSDate*)date position:(CGSize)pos
+{
+    UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
+    
+    UIViewController* popoverContent = [[UIViewController alloc] init];
+    
+    UIView *popoverView = [[UIView alloc] init];
+    popoverView.backgroundColor = [UIColor blackColor];
+    
+    self.datePicker=[[UIDatePicker alloc] initWithFrame:CGRectMake(0,44,320, 216)];
+    self.datePicker.datePickerMode = UIDatePickerModeDate;
+    self.datePicker.hidden = NO;
+    [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
+    
+    [popoverView addSubview:self.datePicker];
+    popoverContent.view = popoverView;
+    self.popover = [[UIPopoverController alloc] initWithContentViewController:popoverContent];
+    
+    [self.popover setPopoverContentSize:CGSizeMake(320, 264) animated:NO];
+    [self.popover presentPopoverFromRect:CGRectMake(pos.width, pos.height, 320, 216) inView:rootView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+}
+
+- (void) removeDatePicker
+{
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        [self.popover dismissPopoverAnimated:YES];
+    }
+    else
+    {
+        [self.datePicker removeFromSuperview];
+    }
+}
+
+
+#pragma mark - UIPopoverControllerDelegate
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+    
+}
+
+- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController
+{
+    return YES;
 }
 
 #pragma mark - UIAlertViewDelegate
 
 - (void)dateChanged:(id) sender
 {
-    // Use date picker to write out the date in a friendly format
+    // Use date picker to write out the date in a %Y-%m-%d format
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.dateStyle = NSDateFormatterMediumStyle;
+    [df setDateFormat:@"yyy-MM-dd"];
     NSString *formatedDate = [df stringFromDate:self.datePicker.date];
+    
+    // send data to actionscript
     FREDispatchStatusEventAsync(AirDatePickerCtx, (const uint8_t *)"CHANGE", (const uint8_t *)[formatedDate UTF8String]);
 }
 
@@ -91,32 +143,54 @@ DEFINE_ANE_FUNCTION(AirDatePickerDisplayDatePicker)
     NSString *month = nil;
     NSString *day = nil;
     
-    // Retrieve title
+    // Retrieve year
     const uint8_t *yearString;
     if (FREGetObjectAsUTF8(argv[0], &stringLength, &yearString) == FRE_OK)
     {
         year = [NSString stringWithUTF8String:(char *)yearString];
     }
     
-    // Retrieve message
+    // Retrieve month
     const uint8_t *monthString;
     if (FREGetObjectAsUTF8(argv[1], &stringLength, &monthString) == FRE_OK)
     {
         month = [NSString stringWithUTF8String:(char *)monthString];
     }
     
-    // Retrieve button 1
+    // Retrieve day
     const uint8_t *dayString;
     if (FREGetObjectAsUTF8(argv[2], &stringLength, &dayString) == FRE_OK)
     {
         day = [NSString stringWithUTF8String:(char *)dayString];
     }
-    
+        
     // Setup and show the Date Picker
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     [df setDateFormat:@"yyy-MM-dd"];
     NSDate *date = [df dateFromString:[NSString stringWithFormat:@"%@/%@/%@",year,month,day]];
-    [[AirDatePicker sharedInstance] start:date];    
+    
+    // show the date picker (use the correct form factor)
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
+    {
+        // get the position where we want the DatePicker to be rendered.
+        int32_t xValue;
+        int32_t yValue;
+        FREGetObjectAsInt32(argv[3], &xValue);
+        FREGetObjectAsInt32(argv[4], &yValue);
+        
+        [[AirDatePicker sharedInstance] showDatePickerPad:date position:CGSizeMake(xValue, yValue)];
+    }
+    else
+    {
+        [[AirDatePicker sharedInstance] showDatePickerPhone:date];
+    }
+    
+    return nil;
+}
+
+DEFINE_ANE_FUNCTION(AirDatePickerRemoveDatePicker)
+{
+    [[AirDatePicker sharedInstance] removeDatePicker];
     
     return nil;
 }
@@ -127,7 +201,7 @@ DEFINE_ANE_FUNCTION(AirDatePickerDisplayDatePicker)
 void AirDatePickerContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet)
 {
     // Register the links btwn AS3 and ObjC. (dont forget to modify the nbFuntionsToLink integer if you are adding/removing functions)
-    NSInteger nbFuntionsToLink = 1;
+    NSInteger nbFuntionsToLink = 2;
     *numFunctionsToTest = nbFuntionsToLink;
     
     FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * nbFuntionsToLink);
@@ -135,6 +209,10 @@ void AirDatePickerContextInitializer(void* extData, const uint8_t* ctxType, FREC
     func[0].name = (const uint8_t*) "AirDatePickerDisplayDatePicker";
     func[0].functionData = NULL;
     func[0].function = &AirDatePickerDisplayDatePicker;
+
+    func[1].name = (const uint8_t*) "AirDatePickerRemoveDatePicker";
+    func[1].functionData = NULL;
+    func[1].function = &AirDatePickerRemoveDatePicker;
     
     *functionsToSet = func;
     
