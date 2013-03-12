@@ -63,7 +63,7 @@ static AirDatePicker *sharedInstance = nil;
     self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 250, 325, 250)];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
     self.datePicker.hidden = NO;
-    self.datePicker.date = [NSDate date];
+    self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
 
     UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
@@ -79,9 +79,10 @@ static AirDatePicker *sharedInstance = nil;
     UIView *popoverView = [[UIView alloc] init];
     popoverView.backgroundColor = [UIColor blackColor];
     
-    self.datePicker=[[UIDatePicker alloc] initWithFrame:CGRectMake(0,44,320, 216)];
+    self.datePicker=[[UIDatePicker alloc] initWithFrame:CGRectMake(0, 44, 320, 216)];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
     self.datePicker.hidden = NO;
+    self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
     
     [popoverView addSubview:self.datePicker];
@@ -104,7 +105,6 @@ static AirDatePicker *sharedInstance = nil;
     }
 }
 
-
 #pragma mark - UIPopoverControllerDelegate
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
@@ -114,7 +114,7 @@ static AirDatePicker *sharedInstance = nil;
 
 - (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController
 {
-    return YES;
+    return NO;
 }
 
 #pragma mark - UIAlertViewDelegate
@@ -163,11 +163,13 @@ DEFINE_ANE_FUNCTION(AirDatePickerDisplayDatePicker)
     {
         day = [NSString stringWithUTF8String:(char *)dayString];
     }
-        
-    // Setup and show the Date Picker
+    
+    NSLog(@"day, month, year = %@ %@ %@",day,month,year);
+    
+    // According to the tr35-10 standard, date format should be MMMM/dd/yyyy.
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"yyy-MM-dd"];
-    NSDate *date = [df dateFromString:[NSString stringWithFormat:@"%@/%@/%@",year,month,day]];
+    [df setDateFormat:@"MM/dd/yyyy"];
+    NSDate *date = [df dateFromString:[NSString stringWithFormat:@"%@/%@/%@",month,day,year]];
     
     // show the date picker (use the correct form factor)
     if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )

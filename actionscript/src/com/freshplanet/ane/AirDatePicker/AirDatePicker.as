@@ -70,7 +70,9 @@ package com.freshplanet.ane.AirDatePicker
 			
 			_callback = callback;
 			
-			_context.call("AirDatePickerDisplayDatePicker", date.fullYear, date.month, date.day, position.x, position.y);
+			var month : Number = date.month + 1; // as3 date: january[0], ..., december[11] 
+
+			_context.call("AirDatePickerDisplayDatePicker", date.fullYear.toString(), month.toString(), date.date.toString(), position.x, position.y);
 		}
 
 		public function removeDatePicker( ) : void
