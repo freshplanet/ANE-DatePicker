@@ -77,25 +77,24 @@ static AirDatePicker *sharedInstance = nil;
 
 - (void) showDatePickerPad:(NSDate*)date anchor:(CGRect)anchor
 {
-    UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
-    
-    UIViewController* popoverContent = [[UIViewController alloc] init];
-    
-    UIView *popoverView = [[UIView alloc] init];
-    popoverView.backgroundColor = [UIColor blackColor];
-    
-    self.datePicker=[[UIDatePicker alloc] initWithFrame:CGRectMake(0, 44, 320, 216)];
+    self.datePicker=[[UIDatePicker alloc] initWithFrame:CGRectMake(0,0,300,216)];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
     self.datePicker.hidden = NO;
     self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
-    
+
+    UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
+    UIViewController *popoverViewController = [[UIViewController alloc] init];
+    UIView *popoverView = [[UIView alloc] init];
     [popoverView addSubview:self.datePicker];
-    popoverContent.view = popoverView;
-    self.popover = [[UIPopoverController alloc] initWithContentViewController:popoverContent];
+    popoverViewController.view = popoverView;
     
-    [self.popover setPopoverContentSize:CGSizeMake(320, 264) animated:NO];
-    [self.popover presentPopoverFromRect:CGRectMake(pos.width, pos.height, 320, 216) inView:rootView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    CGRect anchory = CGRectMake(anchor.origin.x, anchor.origin.y, 300, 216);
+
+    self.popover = [[UIPopoverController alloc] initWithContentViewController:popoverViewController];
+    self.popover.popoverContentSize = CGSizeMake(300, 216);
+    self.popover.delegate = self;
+    [self.popover presentPopoverFromRect:anchory inView:rootView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
 }
 
 - (void) removeDatePicker
@@ -103,6 +102,8 @@ static AirDatePicker *sharedInstance = nil;
     if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
     {
         [self.popover dismissPopoverAnimated:YES];
+        self.popover.delegate = nil;
+        self.popover = nil;
     }
     else
     {
@@ -114,12 +115,11 @@ static AirDatePicker *sharedInstance = nil;
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
 {
-    
-}
-
-- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController
-{
-    return NO;
+    if (self.popover)
+    {
+        [self.popover dismissPopoverAnimated:YES];
+        self.popover = nil;
+    }
 }
 
 #pragma mark - UIAlertViewDelegate
@@ -169,28 +169,52 @@ DEFINE_ANE_FUNCTION(AirDatePickerDisplayDatePicker)
         day = [NSString stringWithUTF8String:(char *)dayString];
     }
     
-    NSLog(@"day, month, year = %@ %@ %@",day,month,year);
-    
-    // According to the tr35-10 standard, date format should be MMMM/dd/yyyy.
+    // Build an NSDate instance from the AS3 data.
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    [df setDateFormat:@"MM/dd/yyyy"];
+    [df setDateFormat:@"MM/dd/yyyy"];  // According to the tr35-10 standard, date format should be MMMM/dd/yyyy.
     NSDate *date = [df dateFromString:[NSString stringWithFormat:@"%@/%@/%@",month,day,year]];
     
-    // show the date picker (use the correct form factor)
+    // Extract Anchor for UIPopoverController (iPad only) or default to top right corner
+    CGRect anchor;
+    if (argc > 3)
+    {
+        // Extract Anchor properties
+        FREObject anchorObject = argv[3];
+        FREObject anchorX, anchorY, anchorWidth, anchorHeight, thrownException;
+        FREGetObjectProperty(anchorObject, (const uint8_t *)"x", &anchorX, &thrownException);
+        FREGetObjectProperty(anchorObject, (const uint8_t *)"y", &anchorY, &thrownException);
+        FREGetObjectProperty(anchorObject, (const uint8_t *)"width", &anchorWidth, &thrownException);
+        FREGetObjectProperty(anchorObject, (const uint8_t *)"height", &anchorHeight, &thrownException);
+        
+        // Convert anchor properties to double
+        double x, y, width, height;
+        FREGetObjectAsDouble(anchorX, &x);
+        FREGetObjectAsDouble(anchorY, &y);
+        FREGetObjectAsDouble(anchorWidth, &width);
+        FREGetObjectAsDouble(anchorHeight, &height);
+        
+        // make a CGRect type
+        CGFloat scale = [[UIScreen mainScreen] scale];
+        anchor = CGRectMake(x/scale, y/scale, width/scale, height/scale);
+        
+        NSLog(@"[AirDatePicker] x, y, width, height = %f %f %f %f", anchor.origin.x, anchor.origin.y, anchor.size.width, anchor.size.height);
+    }
+    else
+    {
+        UIViewController *rootViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+        anchor = CGRectMake(rootViewController.view.bounds.size.width - 100, 0, 100, 1); // Default anchor: Top right corner
+    }
+    
+    // show date picker for iPad/iPhone
     if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
     {
-        // get the position where we want the DatePicker to be rendered.
-        int32_t xValue;
-        int32_t yValue;
-        FREGetObjectAsInt32(argv[3], &xValue);
-        FREGetObjectAsInt32(argv[4], &yValue);
-        
-        [[AirDatePicker sharedInstance] showDatePickerPad:date position:CGSizeMake(xValue, yValue)];
+        [[AirDatePicker sharedInstance] showDatePickerPad:date anchor:anchor];
     }
     else
     {
         [[AirDatePicker sharedInstance] showDatePickerPhone:date];
     }
+
     
     return nil;
 }

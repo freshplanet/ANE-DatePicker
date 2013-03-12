@@ -23,7 +23,7 @@ package com.freshplanet.ane.AirDatePicker
 	import flash.external.ExtensionContext;
 	import flash.system.Capabilities;
 
-	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	
 	public class AirDatePicker extends EventDispatcher
 	{
@@ -64,7 +64,7 @@ package com.freshplanet.ane.AirDatePicker
 			return _instance ? _instance : new AirDatePicker();
 		}
 		
-		public function displayDatePicker( date : Date, position : Point, callback : Function ) : void
+		public function displayDatePicker( date : Date, callback : Function, anchor : Rectangle = null ) : void
 		{
 			if (!isSupported) return;
 			
@@ -72,7 +72,14 @@ package com.freshplanet.ane.AirDatePicker
 			
 			var month : Number = date.month + 1; // as3 date: january[0], ..., december[11] 
 
-			_context.call("AirDatePickerDisplayDatePicker", date.fullYear.toString(), month.toString(), date.date.toString(), position.x, position.y);
+			if (anchor != null)
+			{
+				_context.call("AirDatePickerDisplayDatePicker", date.fullYear.toString(), month.toString(), date.date.toString(), anchor);	
+			}
+			else
+			{
+				_context.call("AirDatePickerDisplayDatePicker", date.fullYear.toString(), month.toString(), date.date.toString());		
+			}	
 		}
 
 		public function removeDatePicker( ) : void

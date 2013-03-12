@@ -24,12 +24,8 @@
 
 + (AirDatePicker *)sharedInstance;
 - (void) showDatePickerPhone:(NSDate*)date;
-- (void) showDatePickerPad:(NSDate*)date position:(CGSize)pos;
+- (void) showDatePickerPad:(NSDate*)date anchor:(CGRect)anchor;
 - (void) removeDatePicker;
-
-// UIPopoverControllerDelegate
-- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController;
-- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController;
 
 @end
 
