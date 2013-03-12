@@ -60,17 +60,22 @@ static AirDatePicker *sharedInstance = nil;
 
 -(void) showDatePickerPhone:(NSDate *)date
 {
-    self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 250, 325, 250)];
+    UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
+    
+    self.datePicker = [[UIDatePicker alloc] init];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
     self.datePicker.hidden = NO;
     self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
-
-    UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
+    
+    CGRect datePickerFrame = self.datePicker.frame;
+    datePickerFrame.origin.y = rootView.bounds.size.height - datePickerFrame.size.height;
+    self.datePicker.frame = datePickerFrame;
+    
     [rootView addSubview:self.datePicker];   
 }
 
-- (void) showDatePickerPad:(NSDate*)date position:(CGSize)pos
+- (void) showDatePickerPad:(NSDate*)date anchor:(CGRect)anchor
 {
     UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
     
