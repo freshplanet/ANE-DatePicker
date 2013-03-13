@@ -94,6 +94,7 @@ static AirDatePicker *sharedInstance = nil;
     self.popover = [[UIPopoverController alloc] initWithContentViewController:popoverViewController];
     self.popover.popoverContentSize = CGSizeMake(300, 216);
     self.popover.delegate = self;
+    self.popover.passthroughViews = [NSArray arrayWithObject:rootView];
     [self.popover presentPopoverFromRect:anchory inView:rootView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
 }
 
