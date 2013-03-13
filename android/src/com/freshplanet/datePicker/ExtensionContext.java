@@ -29,7 +29,7 @@ import com.adobe.fre.FREFunction;
 import com.freshplanet.datePicker.functions.AirDatePickerDisplayDatePicker;
 import com.freshplanet.datePicker.functions.AirDatePickerRemoveDatePicker;
 
-public class ExtensionContext extends FREContext
+public class ExtensionContext extends FREContext 
 {
 	private static final String TAG = "[AirDatePicker] - ExtensionContext";
 	
@@ -53,11 +53,14 @@ public class ExtensionContext extends FREContext
 	// AirDatePicker logic
 	// =====================================================
 	
-	public void displayDatePicker(String year, String month, String day) 
+	public void displayDatePicker(int year, int month, int day) 
 	{
 		Log.d(TAG, "Entering displayDatePicker");
 		
 		Intent displayDatePickerIntent = new Intent(getActivity().getApplicationContext(), DatePickerActivity.class );
+		displayDatePickerIntent.putExtra("year", year);
+		displayDatePickerIntent.putExtra("month", month - 1);  // compensates Date difference between AS3 and Android
+		displayDatePickerIntent.putExtra("day", day);
 		getActivity().startActivity(displayDatePickerIntent);
 		
 		Log.d(TAG, "Exiting displayDatePicker");

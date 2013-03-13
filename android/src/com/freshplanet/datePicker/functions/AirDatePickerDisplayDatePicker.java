@@ -19,6 +19,7 @@
 package com.freshplanet.datePicker.functions;
 
 import android.annotation.TargetApi;
+import android.util.Log;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
@@ -28,8 +29,12 @@ import com.freshplanet.datePicker.ExtensionContext;
 @TargetApi(14)
 public class AirDatePickerDisplayDatePicker implements FREFunction
 {
+	private static final String TAG = "[AirDatePicker] - AirDatePickerDisplayDatePicker";
+	
 	public FREObject call(FREContext context, FREObject[] args)
 	{
+		Log.d(TAG, "Entering call");
+		
 		// Retrieve alert parameters
 		String year = null;
 		String month = null;
@@ -45,9 +50,12 @@ public class AirDatePickerDisplayDatePicker implements FREFunction
 			e.printStackTrace();
 			return null;
 		}
+		
+		Log.d(TAG, "call() year, month, date = " + year + " " + month + " " + day);
 
-		// Start activity
-		((ExtensionContext) context).displayDatePicker(year,month,day);
+		((ExtensionContext) context).displayDatePicker( Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day) );
+		
+		Log.d(TAG, "Exiting call");
 		
 		return null;
 	}
