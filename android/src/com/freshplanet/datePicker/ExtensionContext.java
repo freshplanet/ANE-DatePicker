@@ -21,15 +21,18 @@ package com.freshplanet.datePicker;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.util.Log;
 
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
-import com.freshplanet.datePicker.functions.AirAlertShowAlert;
+import com.freshplanet.datePicker.functions.AirDatePickerDisplayDatePicker;
+import com.freshplanet.datePicker.functions.AirDatePickerRemoveDatePicker;
 
-public class ExtensionContext extends FREContext implements OnClickListener
+public class ExtensionContext extends FREContext
 {
+	private static final String TAG = "[AirDatePicker] - ExtensionContext";
+	
 	// Public API
 	
 	@Override
@@ -40,15 +43,32 @@ public class ExtensionContext extends FREContext implements OnClickListener
 	{
 		Map<String, FREFunction> functionMap = new HashMap<String, FREFunction>();
 		
-		functionMap.put("AirAlertShowAlert", new AirAlertShowAlert());
+		functionMap.put("AirDatePickerDisplayDatePicker", new AirDatePickerDisplayDatePicker());
+		functionMap.put("AirDatePickerRemoveDatePicker", new AirDatePickerRemoveDatePicker());
 		
 		return functionMap;	
 	}
+
+	// =====================================================
+	// AirDatePicker logic
+	// =====================================================
 	
-	public void onClick(DialogInterface dialog, int which)
+	public void displayDatePicker(String year, String month, String day) 
 	{
-		String buttonIndex = (which == DialogInterface.BUTTON_POSITIVE) ? "1" : "0";
+		Log.d(TAG, "Entering displayDatePicker");
 		
-		dispatchStatusEventAsync("CLICK", buttonIndex);
+		Intent displayDatePickerIntent = new Intent(getActivity().getApplicationContext(), DatePickerActivity.class );
+		getActivity().startActivity(displayDatePickerIntent);
+		
+		Log.d(TAG, "Exiting displayDatePicker");
+	}
+	
+	public void removeDatePicker() 
+	{
+		Log.d(TAG, "Entering removeDatePicker");
+		
+		DatePickerActivity.dispose();
+		
+		Log.d(TAG, "Exiting removeDatePicker");
 	}
 }

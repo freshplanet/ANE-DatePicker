@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright 2012 Freshplanet (http://freshplanet.com | opensource@freshplanet.com)
 //  
@@ -18,35 +18,18 @@
 
 package com.freshplanet.datePicker.functions;
 
-import android.annotation.TargetApi;
-
 import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.adobe.fre.FREObject;
+import com.freshplanet.datePicker.ExtensionContext;
 
-@TargetApi(14)
-public class AirAlertShowAlert implements FREFunction
-{
-	public FREObject call(FREContext context, FREObject[] args)
-	{
-		// Retrieve alert parameters
-		String year = null;
-		String month = null;
-		String day = null;
-		try
-		{
-			year = args[0].getAsString();
-			month = args[1].getAsString();
-			day = args[2].getAsString();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
+public class AirDatePickerRemoveDatePicker implements FREFunction {
 
-		// not implemented yet
+	public FREObject call(FREContext context, FREObject[] args) {
+		
+		((ExtensionContext) context).removeDatePicker();
 		
 		return null;
 	}
+
 }
