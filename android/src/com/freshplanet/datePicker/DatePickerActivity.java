@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Window;
 import android.widget.DatePicker;
 
 public class DatePickerActivity extends FragmentActivity
@@ -28,6 +29,9 @@ public class DatePickerActivity extends FragmentActivity
 		Log.d(TAG, "Entering onCreate");
 		
 		super.onCreate(savedInstanceState);
+		
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		
 		activities.add(this);
 		
