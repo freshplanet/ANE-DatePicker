@@ -79,29 +79,6 @@ public class DatePickerActivity extends FragmentActivity
 	{
 		private static final String TAG = "[AirDatePicker] - DatePickerFragment";
 		
-		private class MyDatePickerDialog extends DatePickerDialog
-		{
-			private static final String TAG = "[AirDatePicker] - MyDatePickerDialog";
-			
-			public MyDatePickerDialog(Context context, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
-				super(context, callBack, year, monthOfYear, dayOfMonth);
-			}
-			
-			@Override
-			public void onDateChanged(DatePicker view, int year, int month, int day) 
-			{
-				Log.d(TAG, "Entering onDateChanged");
-				
-				super.onDateChanged(view, year, month, day);
-				
-				month = month + 1; // compensate Date representation differences between AS3 and Android
-				String formattedDate = year + "-" + month + "-" + day;
-				Extension.context.dispatchStatusEventAsync("CHANGE", formattedDate);
-				
-				Log.d(TAG, "Exiting onDateChanged");
-			}
-		};
-		
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
 			Log.d(TAG, "Entering onCreateDialog");
@@ -125,6 +102,55 @@ public class DatePickerActivity extends FragmentActivity
 			
 			Log.d(TAG, "Exiting onDateSet");
 		}
+		
+		private class MyDatePickerDialog extends DatePickerDialog
+		{
+			private static final String TAG = "[AirDatePicker] - MyDatePickerDialog";
+			
+			// store the previous date.  
+			// @see http://stackoverflow.com/questions/12436073/datepicker-ondatechangedlistener-called-twice
+			private String currentDate = "-1";
+			
+			public MyDatePickerDialog(Context context, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
+				super(context, callBack, year, monthOfYear, dayOfMonth);
+			}
+			
+			@Override
+			protected void onStop()
+			{
+				Log.d(TAG, "Entering onStop");
+				
+				currentDate = "-1";
+				
+				Log.d(TAG, "Exiting onStop");
+			}
+			
+			@Override
+			public void onDateChanged(DatePicker view, int year, int month, int day) 
+			{
+				Log.d(TAG, "Entering onDateChanged");
+				
+				super.onDateChanged(view, year, month, day);
+				
+				month = month + 1; // compensate Date representation differences between AS3 and Android
+				String formattedDate = year + "-" + month + "-" + day;
+				
+				if ( currentDate.equals(formattedDate) == false )
+				{
+					Log.d(TAG, "Date change, CHANGE dispatched");
+					currentDate = formattedDate;
+					Extension.context.dispatchStatusEventAsync("CHANGE", formattedDate);
+				}
+				else
+				{
+					Log.d(TAG, "Date didn't change, will not dispatch CHANGE");
+				}
+				
+				
+				Log.d(TAG, "Exiting onDateChanged");
+			}
+		};
+		
 	}
 
 }
