@@ -164,17 +164,13 @@ public class DatePickerActivity extends FragmentActivity
 			{
 				Log.d(TAG, "Entering onDateChanged");
 				
-				super.onDateChanged(view, year, month, day);
-				
+				// Send the new Date back to the AS3 side of the Native Extension
 				month = month + 1; // compensate Date representation differences between AS3 and Android
 				String formattedDate = year + "-" + month + "-" + day;
-				
-				// Send the new Date back to the AS3 side of the Native Extension
-				if ( currentDate.equals(formattedDate) == false )
-				{
+				if ( currentDate.equals(formattedDate) == false ) {
 					currentDate = formattedDate;
 					Extension.context.dispatchStatusEventAsync("CHANGE", formattedDate);
-				}				
+				}
 				
 				Log.d(TAG, "Exiting onDateChanged");
 			}
