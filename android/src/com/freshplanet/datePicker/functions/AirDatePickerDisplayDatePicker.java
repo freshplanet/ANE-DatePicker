@@ -35,7 +35,6 @@ public class AirDatePickerDisplayDatePicker implements FREFunction
 	{
 		Log.d(TAG, "Entering call");
 		
-		// Retrieve alert parameters
 		String year = null;
 		String month = null;
 		String day = null;
@@ -51,8 +50,6 @@ public class AirDatePickerDisplayDatePicker implements FREFunction
 			return null;
 		}
 		
-		Log.d(TAG, "call() year, month, date = " + year + " " + month + " " + day);
-
 		((ExtensionContext) context).displayDatePicker( Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day) );
 		
 		Log.d(TAG, "Exiting call");

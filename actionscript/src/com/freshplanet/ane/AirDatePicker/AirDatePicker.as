@@ -64,6 +64,35 @@ package com.freshplanet.ane.AirDatePicker
 			return _instance ? _instance : new AirDatePicker();
 		}
 		
+
+		/**
+		* Display a Date (month, day, year) picker, using a Native implementation.<br><br>
+		*
+		* For Apple devices we rely on the iOS SDK's UIDatePicker.  For Android, we rely on a DialogFragment
+		* containing a custom DatePickerDialog.<br><br> 
+		*
+		* Android devices should define the DatePickerActivity's theme as @android:style/Theme.Holo.Dialog to 
+		* present the Activity as a true Dialog. <br><br>
+		*
+		* @param date An AS3 Date object used to show a certain date by default in the picker.
+		* @param callback A callback function of the folllowing form:
+		* <code>function myCallback( selectedDate : String ): void</code>.  The <code>selectedDate</code> parameter
+		* will contain the selected date in the following format:  <code>yyyy-mm-dd</code>
+		* @param anchor (optional) On the iPad, the UIDatePicker is displayed in a popover that 
+		* doesn't cover the whole screen. This parameter is the anchor from which the
+		* popover will be presented. For example, it could be the bounds of the button
+		* on which the user clicked to display the image picker. Note that you should
+		* use absolute stage coordinates. Example: <code>var anchor:Rectangle = 
+		* myButton.getBounds(stage);</code>
+		*
+		* @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Date.html
+		* @see http://developer.apple.com/library/ios/#documentation/uikit/reference/UIDatePicker_Class/Reference/UIDatePicker.html
+		* @see http://developer.apple.com/library/ios/#documentation/uikit/reference/UIPopoverController_class/Reference/Reference.html
+		* @see http://developer.android.com/reference/android/app/DatePickerDialog.html
+		* @see http://developer.android.com/guide/topics/ui/controls/pickers.html
+		* @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Date.html
+		*
+		**/
 		public function displayDatePicker( date : Date, callback : Function, anchor : Rectangle = null ) : void
 		{
 			if (!isSupported) return;
@@ -82,6 +111,7 @@ package com.freshplanet.ane.AirDatePicker
 			}	
 		}
 
+		/** Dismisses the DatePicker from the screen. */
 		public function removeDatePicker( ) : void
 		{
 			if (!isSupported) return;

@@ -17,12 +17,20 @@ import android.widget.DatePicker;
 public class DatePickerActivity extends FragmentActivity
 {	
 	private static final String TAG = "[AirDatePicker] - DatePickerActivity";
-	
+
+	/** Every Activity invoked by the Native Extension.  Allows us to kill everything. */	
 	private static ArrayList<DatePickerActivity> activities = new ArrayList<DatePickerActivity>();
-	
-	private DialogFragment datePickerFragment;
+
+	/** The current Date coming from the ActionScript side of the native extension */	
 	private static GregorianCalendar currentDateValue;
+
+	/** Our picker. */	
+	private DialogFragment datePickerFragment;
 	
+    //-----------------------------------------------------//
+	//					                     ACTIVITY API				   
+	//-----------------------------------------------------//
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -31,7 +39,6 @@ public class DatePickerActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
 		
 		activities.add(this);
 		
@@ -63,6 +70,10 @@ public class DatePickerActivity extends FragmentActivity
 		Log.d(TAG, "Exiting onDestroy");
 	}
 	
+    //-----------------------------------------------------//
+	//					                     DISPOSE LOGIC				   
+	//-----------------------------------------------------//
+
 	public static void dispose()
 	{
 		Log.d(TAG, "Entering dispose");
@@ -74,10 +85,18 @@ public class DatePickerActivity extends FragmentActivity
 		
 		Log.d(TAG, "Exiting dispose");
 	}
+
+    //-----------------------------------------------------//
+	//					                 DIALOG FRAGMENT			   
+	//-----------------------------------------------------//
 	
 	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener
 	{
 		private static final String TAG = "[AirDatePicker] - DatePickerFragment";
+
+		//-----------------------------------------------------//
+		//					                    DIALOG CREATION			   
+		//-----------------------------------------------------//
 		
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
@@ -88,11 +107,15 @@ public class DatePickerActivity extends FragmentActivity
 			int month = c.get(Calendar.MONTH);
 			int day = c.get(Calendar.DAY_OF_MONTH);
 			
-			MyDatePickerDialog picker = new MyDatePickerDialog( getActivity(), this, year, month, day);
+			AirDatePickerDialog picker = new AirDatePickerDialog( getActivity(), this, year, month, day);
 			
 			Log.d(TAG, "Exiting onCreateDialog");
 			return picker;
 		}
+
+		//-----------------------------------------------------//
+		//	   DatePickerDialog.OnDateSetListener IMPLEMENTATION			   
+		//-----------------------------------------------------//
 		
 		public void onDateSet(DatePicker view, int year, int month, int date) 
 		{
@@ -102,16 +125,26 @@ public class DatePickerActivity extends FragmentActivity
 			
 			Log.d(TAG, "Exiting onDateSet");
 		}
+
+		//-----------------------------------------------------//
+		//		                     CUSTOM DATE PICKER DIALOG
+		//-----------------------------------------------------//
 		
-		private class MyDatePickerDialog extends DatePickerDialog
+		/** 
+		*  AirDatePickerDialog overrides onDateChanged() and reports every 
+		*  date change back to the ActionScript side of the Native Extension 
+		*/
+		private class AirDatePickerDialog extends DatePickerDialog
 		{
 			private static final String TAG = "[AirDatePicker] - MyDatePickerDialog";
 			
-			// store the previous date.  
+			// There is a bug in the Android API where the dateChange listener is triggered twice.
+			// This is a workaround for this problem.  (store the previous date.)
+			//   
 			// @see http://stackoverflow.com/questions/12436073/datepicker-ondatechangedlistener-called-twice
 			private String currentDate = "-1";
 			
-			public MyDatePickerDialog(Context context, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
+			public AirDatePickerDialog(Context context, OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
 				super(context, callBack, year, monthOfYear, dayOfMonth);
 			}
 			
@@ -120,6 +153,7 @@ public class DatePickerActivity extends FragmentActivity
 			{
 				Log.d(TAG, "Entering onStop");
 				
+				// removes the current stored date
 				currentDate = "-1";
 				
 				Log.d(TAG, "Exiting onStop");
@@ -135,17 +169,12 @@ public class DatePickerActivity extends FragmentActivity
 				month = month + 1; // compensate Date representation differences between AS3 and Android
 				String formattedDate = year + "-" + month + "-" + day;
 				
+				// Send the new Date back to the AS3 side of the Native Extension
 				if ( currentDate.equals(formattedDate) == false )
 				{
-					Log.d(TAG, "Date change, CHANGE dispatched");
 					currentDate = formattedDate;
 					Extension.context.dispatchStatusEventAsync("CHANGE", formattedDate);
-				}
-				else
-				{
-					Log.d(TAG, "Date didn't change, will not dispatch CHANGE");
-				}
-				
+				}				
 				
 				Log.d(TAG, "Exiting onDateChanged");
 			}

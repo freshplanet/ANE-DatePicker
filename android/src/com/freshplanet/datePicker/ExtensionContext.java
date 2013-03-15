@@ -38,6 +38,10 @@ public class ExtensionContext extends FREContext
 	@Override
 	public void dispose() { }
 
+	//-----------------------------------------------------//
+	// 										 EXTENSION API
+	//-----------------------------------------------------//
+
 	@Override
 	public Map<String, FREFunction> getFunctions()
 	{
@@ -49,10 +53,10 @@ public class ExtensionContext extends FREContext
 		return functionMap;	
 	}
 
-	// =====================================================
-	// AirDatePicker logic
-	// =====================================================
-	
+	//-----------------------------------------------------//
+	//					                   DATE PICKER API	
+	//-----------------------------------------------------//
+
 	public void displayDatePicker(int year, int month, int day) 
 	{
 		Log.d(TAG, "Entering displayDatePicker");
