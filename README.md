@@ -15,20 +15,20 @@ Usage
 
 If you are going to be targeting Android, add the DatePickerActivity to your AIR application configuration file:
 
-    ```xml
-    <!-- AirDatePicker -->
-    <activity android:name="com.freshplanet.datePicker.DatePickerActivity" android:theme="@android:style/Theme.Holo.Dialog"/>
-    ```
+```xml
+<!-- AirDatePicker -->
+<activity android:name="com.freshplanet.datePicker.DatePickerActivity" android:theme="@android:style/Theme.Holo.Dialog"/>
+```
 
-    ``` actionscript
-    // Required params
-    var currentDate : Date = new Date();
-    var callback : Function = function( selectedDate:String ) : void {
-    	trace("selected date = ", selectedDate.toString());
-    }
-    // Native extension call
-    AirDatePicker.instance.displayDatePicker(currentDate, callback);
-    ```    
+```actionscript
+// Required params
+var currentDate : Date = new Date();
+var callback : Function = function( selectedDate:String ) : void {
+	trace("selected date = ", selectedDate.toString());
+}
+// Native extension call
+AirDatePicker.instance.displayDatePicker(currentDate, callback);
+```    
 For iPad you can define custom positioning of the picker.
 
 For more information, please look at the Actionscript documentation in [AirDatePicker.as](https://github.com/freshplanet/ANE-DatePicker/blob/master/actionscript/src/com/freshplanet/ane/AirDatePicker/AirDatePicker.as).
