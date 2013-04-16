@@ -20,7 +20,7 @@ If you are going to be targeting Android, add the DatePickerActivity to your AIR
     <activity android:name="com.freshplanet.datePicker.DatePickerActivity" android:theme="@android:style/Theme.Holo.Dialog"/>
     ```
 
-    ``` actionscript
+    ```actionscript
     // Required params
     var currentDate : Date = new Date();
     var callback : Function = function( selectedDate:String ) : void {
