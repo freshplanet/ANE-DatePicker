@@ -21,9 +21,8 @@ package com.freshplanet.ane.AirDatePicker
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
-	import flash.system.Capabilities;
-
 	import flash.geom.Rectangle;
+	import flash.system.Capabilities;
 	
 	public class AirDatePicker extends EventDispatcher
 	{
@@ -32,6 +31,9 @@ package com.freshplanet.ane.AirDatePicker
 		// 									   PUBLIC API										 //
 		// 																						 //
 		// --------------------------------------------------------------------------------------//
+		
+		public static const EVENT_CHANGE:String = "CHANGE";
+		public static const EVENT_UPDATE:String = "UPDATE";
 		
 		/** AirDatePicker is supported on iOS and Android devices. */
 		public static function get isSupported() : Boolean
@@ -134,9 +136,10 @@ package com.freshplanet.ane.AirDatePicker
 		
 		private var _callback : Function = null;
 		
+		
 		private function onStatus( event : StatusEvent ) : void
 		{
-			if (event.code == "CHANGE")
+			if (event.code == EVENT_CHANGE)
 			{
 				if (_callback !== null)
 				{
@@ -148,6 +151,10 @@ package com.freshplanet.ane.AirDatePicker
 				{
 					trace("Error: There is no callback, cannot return the picked date");
 				}
+			}
+			if(this.hasEventListener(StatusEvent.STATUS)) 
+			{
+				this.dispatchEvent(event);
 			}
 		}
 	}
