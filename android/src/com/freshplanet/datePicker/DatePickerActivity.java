@@ -156,6 +156,7 @@ public class DatePickerActivity extends FragmentActivity
 				// removes the current stored date
 				currentDate = "-1";
 				
+				DatePickerActivity.dispose();
 				Log.d(TAG, "Exiting onStop");
 			}
 			
