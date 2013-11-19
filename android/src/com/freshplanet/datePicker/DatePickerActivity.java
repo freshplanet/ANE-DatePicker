@@ -121,6 +121,11 @@ public class DatePickerActivity extends FragmentActivity
 		{
 			Log.d(TAG, "Entering onDateSet");
 			
+			
+			month = month + 1; // compensate Date representation differences between AS3 and Android
+			String formattedDate = year + "-" + month + "-" + date;
+			Extension.context.dispatchStatusEventAsync("CHANGE", formattedDate);
+			
 			DatePickerActivity.dispose();
 			
 			Log.d(TAG, "Exiting onDateSet");
@@ -157,6 +162,7 @@ public class DatePickerActivity extends FragmentActivity
 				currentDate = "-1";
 				
 				DatePickerActivity.dispose();
+				
 				Log.d(TAG, "Exiting onStop");
 			}
 			
@@ -170,7 +176,7 @@ public class DatePickerActivity extends FragmentActivity
 				String formattedDate = year + "-" + month + "-" + day;
 				if ( currentDate.equals(formattedDate) == false ) {
 					currentDate = formattedDate;
-					Extension.context.dispatchStatusEventAsync("CHANGE", formattedDate);
+					Extension.context.dispatchStatusEventAsync("UPDATE", formattedDate);
 				}
 				
 				Log.d(TAG, "Exiting onDateChanged");
