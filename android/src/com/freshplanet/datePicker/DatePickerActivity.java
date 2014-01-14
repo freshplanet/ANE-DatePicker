@@ -108,7 +108,13 @@ public class DatePickerActivity extends FragmentActivity
 			int day = c.get(Calendar.DAY_OF_MONTH);
 			
 			AirDatePickerDialog picker = new AirDatePickerDialog( getActivity(), this, year, month, day);
-			
+
+ 			if (android.os.Build.VERSION.SDK_INT >= 11)
+ 			{
+			picker.getDatePicker().setCalendarViewShown(false);
+			long thirteenyears = 410220000000L;
+			picker.getDatePicker().setMaxDate(System.currentTimeMillis()-thirteenyears); 
+			}
 			Log.d(TAG, "Exiting onCreateDialog");
 			return picker;
 		}

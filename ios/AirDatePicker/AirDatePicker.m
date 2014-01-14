@@ -64,6 +64,19 @@ static AirDatePicker *sharedInstance = nil;
     
     self.datePicker = [[UIDatePicker alloc] init];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
+
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDate *currentDate = [NSDate date];
+    NSDateComponents *comps = [[NSDateComponents alloc] init];
+    [comps setYear:-13];
+    NSDate *minDate = [gregorian dateByAddingComponents:comps toDate:currentDate  options:0];
+    [comps setYear:-150];
+    NSDate *maxDate = [gregorian dateByAddingComponents:comps toDate:currentDate  options:0];
+    //[comps release];
+
+    self.datePicker.minimumDate = minDate;
+    self.datePicker.maximumDate = maxDate;
+
     self.datePicker.hidden = NO;
     self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
