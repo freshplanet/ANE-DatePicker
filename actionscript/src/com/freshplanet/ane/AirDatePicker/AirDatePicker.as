@@ -35,6 +35,9 @@ package com.freshplanet.ane.AirDatePicker
 		public static const EVENT_CHANGE:String = "CHANGE";
 		public static const EVENT_UPDATE:String = "UPDATE";
 		
+		private var _minimumDate:Date;
+		private var _maximumDate:Date;
+		
 		/** AirDatePicker is supported on iOS and Android devices. */
 		public static function get isSupported() : Boolean
 		{
@@ -111,6 +114,16 @@ package com.freshplanet.ane.AirDatePicker
 			{
 				_context.call("AirDatePickerDisplayDatePicker", date.fullYear.toString(), month.toString(), date.date.toString());		
 			}	
+		}
+		
+		public function setMinimumDate( date:Date ) : void 
+		{
+			_context.call("setMinimumDate", date);
+		}
+		
+		public function setMaximumDate( date:Date ) : void 
+		{
+			_context.call("setMaximumDate", date);
 		}
 
 		/** Dismisses the DatePicker from the screen. */
