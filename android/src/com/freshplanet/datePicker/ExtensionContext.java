@@ -18,6 +18,7 @@
 
 package com.freshplanet.datePicker;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +29,15 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.freshplanet.datePicker.functions.AirDatePickerDisplayDatePicker;
 import com.freshplanet.datePicker.functions.AirDatePickerRemoveDatePicker;
+import com.freshplanet.datePicker.functions.SetMaxDateFunction;
+import com.freshplanet.datePicker.functions.SetMinDateFunction;
 
 public class ExtensionContext extends FREContext 
 {
 	private static final String TAG = "[AirDatePicker] - ExtensionContext";
+	
+	private Date minDate;
+	private Date maxDate;
 	
 	// Public API
 	
@@ -49,6 +55,8 @@ public class ExtensionContext extends FREContext
 		
 		functionMap.put("AirDatePickerDisplayDatePicker", new AirDatePickerDisplayDatePicker());
 		functionMap.put("AirDatePickerRemoveDatePicker", new AirDatePickerRemoveDatePicker());
+		functionMap.put("setMinimumDate", new SetMinDateFunction());
+		functionMap.put("setMaximumDate", new SetMaxDateFunction());
 		
 		return functionMap;	
 	}
@@ -78,4 +86,17 @@ public class ExtensionContext extends FREContext
 		
 		Log.d(TAG, "Exiting removeDatePicker");
 	}
+	
+
+	public void setMinDate(Date date) 
+	{
+		minDate = date;
+	}
+	
+	public void setMaxDate(Date date) 
+	{
+		maxDate = date;
+	}
+	
+	
 }
