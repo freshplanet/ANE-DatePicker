@@ -70,9 +70,15 @@ public class ExtensionContext extends FREContext
 		Log.d(TAG, "Entering displayDatePicker");
 		
 		Intent displayDatePickerIntent = new Intent(getActivity().getApplicationContext(), DatePickerActivity.class );
-		displayDatePickerIntent.putExtra("year", year);
-		displayDatePickerIntent.putExtra("month", month - 1);  // compensates Date difference between AS3 and Android
-		displayDatePickerIntent.putExtra("day", day);
+		displayDatePickerIntent.putExtra(DatePickerActivity.YEAR, year);
+		displayDatePickerIntent.putExtra(DatePickerActivity.MONTH, month - 1);  // compensates Date difference between AS3 and Android
+		displayDatePickerIntent.putExtra(DatePickerActivity.DAY, day);
+		if(minDate != null) {
+			displayDatePickerIntent.putExtra(DatePickerActivity.MIN_DATE, minDate.getTime());
+		}
+		if(maxDate != null) {
+			displayDatePickerIntent.putExtra(DatePickerActivity.MAX_DATE, maxDate.getTime());
+		}
 		getActivity().startActivity(displayDatePickerIntent);
 		
 		Log.d(TAG, "Exiting displayDatePicker");
