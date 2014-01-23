@@ -118,12 +118,26 @@ package com.freshplanet.ane.AirDatePicker
 		
 		public function setMinimumDate( date:Date ) : void 
 		{
-			_context.call("setMinimumDate", date);
+			if(date) {
+				_context.call("setMinimumDate", date.time);
+			} else {
+				_context.call("clearMinimumDate");
+			}
 		}
+		
 		
 		public function setMaximumDate( date:Date ) : void 
 		{
-			_context.call("setMaximumDate", date);
+			if(date) {
+				_context.call("setMaximumDate", date.time);
+			} else {
+				_context.call("clearMaximumDate");
+			}
+		}
+		
+		public function clearMaximumDate() : void 
+		{
+			_context.call("clearMinimumDate");
 		}
 
 		/** Dismisses the DatePicker from the screen. */

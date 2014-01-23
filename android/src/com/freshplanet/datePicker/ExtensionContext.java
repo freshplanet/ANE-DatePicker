@@ -29,6 +29,8 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.freshplanet.datePicker.functions.AirDatePickerDisplayDatePicker;
 import com.freshplanet.datePicker.functions.AirDatePickerRemoveDatePicker;
+import com.freshplanet.datePicker.functions.ClearMaxDateFunction;
+import com.freshplanet.datePicker.functions.ClearMinDateFunction;
 import com.freshplanet.datePicker.functions.SetMaxDateFunction;
 import com.freshplanet.datePicker.functions.SetMinDateFunction;
 
@@ -57,7 +59,8 @@ public class ExtensionContext extends FREContext
 		functionMap.put("AirDatePickerRemoveDatePicker", new AirDatePickerRemoveDatePicker());
 		functionMap.put("setMinimumDate", new SetMinDateFunction());
 		functionMap.put("setMaximumDate", new SetMaxDateFunction());
-		
+		functionMap.put("clearMinimumDate", new ClearMinDateFunction());
+		functionMap.put("clearMaximumDate", new ClearMaxDateFunction());
 		return functionMap;	
 	}
 
