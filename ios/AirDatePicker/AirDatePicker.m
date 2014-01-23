@@ -36,6 +36,8 @@ FREContext AirDatePickerCtx = nil;
 #pragma mark - Singleton
 
 static AirDatePicker *sharedInstance = nil;
+static NSDate *minimumDate = nil;
+static NSDate *maximumDate = nil;
 
 + (AirDatePicker *)sharedInstance
 {
@@ -60,23 +62,20 @@ static AirDatePicker *sharedInstance = nil;
 
 -(void) showDatePickerPhone:(NSDate *)date
 {
+    NSLog(@"[AirDatePicker] entering showDatePickerPhone");
     UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
     
     self.datePicker = [[UIDatePicker alloc] init];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
 
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDate *currentDate = [NSDate date];
-    NSDateComponents *comps = [[NSDateComponents alloc] init];
-    [comps setYear:-13];
-    NSDate *minDate = [gregorian dateByAddingComponents:comps toDate:currentDate  options:0];
-    [comps setYear:-150];
-    NSDate *maxDate = [gregorian dateByAddingComponents:comps toDate:currentDate  options:0];
-    //[comps release];
-
-    self.datePicker.minimumDate = minDate;
-    self.datePicker.maximumDate = maxDate;
-
+    if(minimumDate != nil) {
+        self.datePicker.minimumDate = minimumDate;
+    }
+    
+    if(maximumDate != nil) {
+        self.datePicker.maximumDate = maximumDate;
+    }
+    
     self.datePicker.hidden = NO;
     self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
@@ -85,16 +84,27 @@ static AirDatePicker *sharedInstance = nil;
     datePickerFrame.origin.y = rootView.bounds.size.height - datePickerFrame.size.height;
     self.datePicker.frame = datePickerFrame;
     
-    [rootView addSubview:self.datePicker];   
+    [rootView addSubview:self.datePicker];
+    NSLog(@"[AirDatePicker] exiting showDatePickerPhone");
 }
 
 - (void) showDatePickerPad:(NSDate*)date anchor:(CGRect)anchor
 {
     self.datePicker=[[UIDatePicker alloc] initWithFrame:CGRectMake(0,0,300,216)];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
+    
+    if(minimumDate != nil) {
+        self.datePicker.minimumDate = minimumDate;
+    }
+    
+    if(maximumDate != nil) {
+        self.datePicker.maximumDate = maximumDate;
+    }
+    
     self.datePicker.hidden = NO;
     self.datePicker.date = date;
     [self.datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
+    
 
     UIView *rootView = [[[[UIApplication sharedApplication] keyWindow] rootViewController] view];
     UIViewController *popoverViewController = [[UIViewController alloc] init];
@@ -240,13 +250,85 @@ DEFINE_ANE_FUNCTION(AirDatePickerRemoveDatePicker)
     return nil;
 }
 
+DEFINE_ANE_FUNCTION(setMinDate)
+{
+    NSLog(@"Entering setMinDate");
+    if(argc == 1) {
+        double millis;
+        FREResult result = FREGetObjectAsDouble(argv[0], &millis);
+        if (result == FRE_OK) {
+            minimumDate = [NSDate dateWithTimeIntervalSince1970:(millis * 0.001)];
+        } else {
+            NSLog(@"Problem setting minimum date:");
+            switch (result) {
+                case FRE_TYPE_MISMATCH:
+                    NSLog(@" -> FRE_TYPE_MISMATCH");
+                    break;
+                case FRE_WRONG_THREAD:
+                    NSLog(@" -> FRE_WRONG_THREAD");
+                    break;
+                case FRE_INVALID_ARGUMENT:
+                    NSLog(@" -> FRE_INVALID_ARGUMENT");
+                    break;
+                case FRE_INVALID_OBJECT:
+                    NSLog(@" -> FRE_INVALID_OBJECT");
+                    break;
+            }
+        }
+    }
+    NSLog(@"Exiting setMinDate");
+    return nil;
+}
+
+DEFINE_ANE_FUNCTION(clearMinDate)
+{
+    minimumDate = NULL;
+    return nil;
+}
+
+DEFINE_ANE_FUNCTION(setMaxDate)
+{
+    NSLog(@"Entering setMaxDate");
+    if(argc == 1) {
+        double millis;
+        FREResult result = FREGetObjectAsDouble(argv[0], &millis);
+        if (result == FRE_OK) {
+            maximumDate = [NSDate dateWithTimeIntervalSince1970:(millis * 0.001)];
+        } else {
+            NSLog(@"Problem setting maximum date");
+            switch (result) {
+                case FRE_TYPE_MISMATCH:
+                    NSLog(@" -> FRE_TYPE_MISMATCH");
+                    break;
+                case FRE_WRONG_THREAD:
+                    NSLog(@" -> FRE_WRONG_THREAD");
+                    break;
+                case FRE_INVALID_ARGUMENT:
+                    NSLog(@" -> FRE_INVALID_ARGUMENT");
+                    break;
+                case FRE_INVALID_OBJECT:
+                    NSLog(@" -> FRE_INVALID_OBJECT");
+                    break;
+            }
+        }
+    }
+    NSLog(@"Exiting setMaxDate");
+    return nil;
+}
+
+DEFINE_ANE_FUNCTION(clearMaxDate)
+{
+    maximumDate = NULL;
+    return nil;
+}
+
 
 #pragma mark - ANE setup
 
 void AirDatePickerContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctionsToTest, const FRENamedFunction** functionsToSet)
 {
     // Register the links btwn AS3 and ObjC. (dont forget to modify the nbFuntionsToLink integer if you are adding/removing functions)
-    NSInteger nbFuntionsToLink = 2;
+    NSInteger nbFuntionsToLink = 6;
     *numFunctionsToTest = nbFuntionsToLink;
     
     FRENamedFunction* func = (FRENamedFunction*) malloc(sizeof(FRENamedFunction) * nbFuntionsToLink);
@@ -258,6 +340,22 @@ void AirDatePickerContextInitializer(void* extData, const uint8_t* ctxType, FREC
     func[1].name = (const uint8_t*) "AirDatePickerRemoveDatePicker";
     func[1].functionData = NULL;
     func[1].function = &AirDatePickerRemoveDatePicker;
+    
+    func[2].name = (const uint8_t*) "setMinimumDate";
+    func[2].functionData = NULL;
+    func[2].function = &setMinDate;
+    
+    func[3].name = (const uint8_t*) "setMaximumDate";
+    func[3].functionData = NULL;
+    func[3].function = &setMaxDate;
+    
+    func[4].name = (const uint8_t*) "clearMinimumDate";
+    func[4].functionData = NULL;
+    func[4].function = &clearMinDate;
+    
+    func[5].name = (const uint8_t*) "clearMaximumDate";
+    func[5].functionData = NULL;
+    func[5].function = &clearMaxDate;
     
     *functionsToSet = func;
     
