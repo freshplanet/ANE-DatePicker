@@ -20,8 +20,7 @@ public class SetMinDateFunction implements FREFunction {
 				Extension.context.setMinDate(null);
 			} else {
 				try {
-					long milliseconds = (long) as3date.getProperty("time").getAsDouble();
-					Extension.context.setMinDate(new Date(milliseconds));
+					Extension.context.setMinDate(new Date((long) as3date.getAsDouble()));
 				} catch (Exception e) {
 					Log.e("AirDatePicker", "error in SetMinDateFunction.call", e);
 					Extension.context.setMinDate(null);

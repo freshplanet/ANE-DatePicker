@@ -20,8 +20,7 @@ public class SetMaxDateFunction implements FREFunction {
 				Extension.context.setMaxDate(null);
 			} else {
 				try {
-					long milliseconds = (long) as3date.getProperty("time").getAsDouble();
-					Extension.context.setMaxDate(new Date(milliseconds));
+					Extension.context.setMaxDate(new Date((long) as3date.getAsDouble()));
 				} catch (Exception e) {
 					Log.e("AirDatePicker", "error in SetMinDateFunction.call", e);
 					Extension.context.setMaxDate(null);
