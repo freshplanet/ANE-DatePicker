@@ -18,6 +18,7 @@
 
 package com.freshplanet.datePicker;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +29,17 @@ import com.adobe.fre.FREContext;
 import com.adobe.fre.FREFunction;
 import com.freshplanet.datePicker.functions.AirDatePickerDisplayDatePicker;
 import com.freshplanet.datePicker.functions.AirDatePickerRemoveDatePicker;
+import com.freshplanet.datePicker.functions.ClearMaxDateFunction;
+import com.freshplanet.datePicker.functions.ClearMinDateFunction;
+import com.freshplanet.datePicker.functions.SetMaxDateFunction;
+import com.freshplanet.datePicker.functions.SetMinDateFunction;
 
 public class ExtensionContext extends FREContext 
 {
 	private static final String TAG = "[AirDatePicker] - ExtensionContext";
+	
+	private Date minDate;
+	private Date maxDate;
 	
 	// Public API
 	
@@ -49,7 +57,10 @@ public class ExtensionContext extends FREContext
 		
 		functionMap.put("AirDatePickerDisplayDatePicker", new AirDatePickerDisplayDatePicker());
 		functionMap.put("AirDatePickerRemoveDatePicker", new AirDatePickerRemoveDatePicker());
-		
+		functionMap.put("setMinimumDate", new SetMinDateFunction());
+		functionMap.put("setMaximumDate", new SetMaxDateFunction());
+		functionMap.put("clearMinimumDate", new ClearMinDateFunction());
+		functionMap.put("clearMaximumDate", new ClearMaxDateFunction());
 		return functionMap;	
 	}
 
@@ -62,9 +73,15 @@ public class ExtensionContext extends FREContext
 		Log.d(TAG, "Entering displayDatePicker");
 		
 		Intent displayDatePickerIntent = new Intent(getActivity().getApplicationContext(), DatePickerActivity.class );
-		displayDatePickerIntent.putExtra("year", year);
-		displayDatePickerIntent.putExtra("month", month - 1);  // compensates Date difference between AS3 and Android
-		displayDatePickerIntent.putExtra("day", day);
+		displayDatePickerIntent.putExtra(DatePickerActivity.YEAR, year);
+		displayDatePickerIntent.putExtra(DatePickerActivity.MONTH, month - 1);  // compensates Date difference between AS3 and Android
+		displayDatePickerIntent.putExtra(DatePickerActivity.DAY, day);
+		if(minDate != null) {
+			displayDatePickerIntent.putExtra(DatePickerActivity.MIN_DATE, minDate.getTime());
+		}
+		if(maxDate != null) {
+			displayDatePickerIntent.putExtra(DatePickerActivity.MAX_DATE, maxDate.getTime());
+		}
 		getActivity().startActivity(displayDatePickerIntent);
 		
 		Log.d(TAG, "Exiting displayDatePicker");
@@ -78,4 +95,17 @@ public class ExtensionContext extends FREContext
 		
 		Log.d(TAG, "Exiting removeDatePicker");
 	}
+	
+
+	public void setMinDate(Date date) 
+	{
+		minDate = date;
+	}
+	
+	public void setMaxDate(Date date) 
+	{
+		maxDate = date;
+	}
+	
+	
 }

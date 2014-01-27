@@ -17,12 +17,17 @@ import android.widget.DatePicker;
 public class DatePickerActivity extends FragmentActivity
 {	
 	private static final String TAG = "[AirDatePicker] - DatePickerActivity";
+	
+	public static final String YEAR = "year";
+	public static final String MONTH = "month";
+	public static final String DAY = "day";
+	
+	public static final String MIN_DATE = "minDate";
+	public static final String MAX_DATE = "maxDate";
 
 	/** Every Activity invoked by the Native Extension.  Allows us to kill everything. */	
 	private static ArrayList<DatePickerActivity> activities = new ArrayList<DatePickerActivity>();
 
-	/** The current Date coming from the ActionScript side of the native extension */	
-	private static GregorianCalendar currentDateValue;
 
 	/** Our picker. */	
 	private DialogFragment datePickerFragment;
@@ -43,13 +48,22 @@ public class DatePickerActivity extends FragmentActivity
 		activities.add(this);
 		
 		Bundle extras = this.getIntent().getExtras();
-		int year = extras.getInt("year");
-		int month = extras.getInt("month");
-		int day = extras.getInt("day");
+		Bundle args = new Bundle();
+
+		args.putInt(YEAR,  extras.getInt(YEAR));
+		args.putInt(MONTH, extras.getInt(MONTH));
+		args.putInt(DAY, extras.getInt(DAY));
 		
-		currentDateValue = new GregorianCalendar(year, month, day);
+		if(extras.containsKey(MIN_DATE)) {
+			args.putLong(MIN_DATE, extras.getLong(MIN_DATE));
+		}
+		
+		if(extras.containsKey(MAX_DATE)) {
+			args.putLong(MAX_DATE, extras.getLong(MAX_DATE));
+		}
 
 		datePickerFragment = new DatePickerFragment();
+		datePickerFragment.setArguments(args);
 		datePickerFragment.show(getSupportFragmentManager(), "datePicker");
 		
 		Log.d(TAG, "Exiting onCreate");
@@ -63,7 +77,6 @@ public class DatePickerActivity extends FragmentActivity
 		super.onDestroy();
 		
 		this.datePickerFragment.dismiss();
-		currentDateValue = null;
 				
 		activities.remove(this);
 		
@@ -101,19 +114,24 @@ public class DatePickerActivity extends FragmentActivity
 		public Dialog onCreateDialog(Bundle savedInstanceState)
 		{
 			Log.d(TAG, "Entering onCreateDialog");
-			
-			final Calendar c = DatePickerActivity.currentDateValue;
-			int year = c.get(Calendar.YEAR);
-			int month = c.get(Calendar.MONTH);
-			int day = c.get(Calendar.DAY_OF_MONTH);
+			Bundle args = this.getArguments();
+			int year = args.getInt(YEAR);
+			int month = args.getInt(MONTH);
+			int day = args.getInt(DAY);
 			
 			AirDatePickerDialog picker = new AirDatePickerDialog( getActivity(), this, year, month, day);
-
+			
+			if(args.containsKey(MIN_DATE)) {
+				picker.getDatePicker().setMinDate(args.getLong(MIN_DATE));
+			}
+			
+			if(args.containsKey(MAX_DATE)) {
+				picker.getDatePicker().setMaxDate(args.getLong(MAX_DATE));
+			}
+			
  			if (android.os.Build.VERSION.SDK_INT >= 11)
  			{
-			picker.getDatePicker().setCalendarViewShown(false);
-			long thirteenyears = 410220000000L;
-			picker.getDatePicker().setMaxDate(System.currentTimeMillis()-thirteenyears); 
+				picker.getDatePicker().setCalendarViewShown(false);
 			}
 			Log.d(TAG, "Exiting onCreateDialog");
 			return picker;
