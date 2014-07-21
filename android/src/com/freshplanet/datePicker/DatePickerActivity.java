@@ -118,8 +118,21 @@ public class DatePickerActivity extends FragmentActivity
 			int year = args.getInt(YEAR);
 			int month = args.getInt(MONTH);
 			int day = args.getInt(DAY);
+			final AirDatePickerDialog picker = new AirDatePickerDialog( getActivity(), this, year, month, day);
 			
-			AirDatePickerDialog picker = new AirDatePickerDialog( getActivity(), this, year, month, day);
+			picker.setButton(DialogInterface.BUTTON_POSITIVE, getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Extension.context.dispatchStatusEventAsync("CHANGE", picker.currentDate);
+				}
+			});
+			
+			picker.setButton(DialogInterface.BUTTON_NEGATIVE, getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Extension.context.dispatchStatusEventAsync("CANCEL", "");
+				}
+			});
 			
 			if(args.containsKey(MIN_DATE)) {
 				picker.getDatePicker().setMinDate(args.getLong(MIN_DATE));
