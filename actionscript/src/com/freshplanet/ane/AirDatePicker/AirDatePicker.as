@@ -34,6 +34,7 @@ package com.freshplanet.ane.AirDatePicker
 		
 		public static const EVENT_CHANGE:String = "CHANGE";
 		public static const EVENT_UPDATE:String = "UPDATE";
+		public static const EVENT_CANCEL:String = "CANCEL";
 		
 		private var _minimumDate:Date;
 		private var _maximumDate:Date;
